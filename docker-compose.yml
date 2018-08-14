@@ -1,0 +1,14 @@
+version: '3'
+services:
+  web:
+    image: "webdevops/php-nginx:alpine"
+    user: application
+    volumes:
+    - $HOME/.composer:/home/application/.composer:delegated
+    - ./:/app:delegated
+    working_dir: /app
+    ports:
+    - 80:80
+    environment:
+    - WEB_DOCUMENT_ROOT=/app
+    - WEB_DOCUMENT_INDEX=index.php

@@ -1,0 +1,28 @@
+{
+  "name": "neospheres/keycloak-sdk",
+  "description": "Library to interact with SSO server that runs with Keycloak",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Dmitry Landa",
+      "email": "dmitriy.landa@noveogroup.com"
+    }
+  ],
+  "type": "library",
+  "require": {
+    "php": ">=7.1",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "~6.0",
+    "nesbot/carbon": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+
+  },
+  "autoload": {
+    "psr-4": {
+      "Neospheres\\Keycloak\\": "src/Keycloak",
+      "Neospheres\\Keycloak\\Test\\": "tests/"
+    }
+  }
+}
