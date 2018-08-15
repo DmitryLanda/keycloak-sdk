@@ -33,9 +33,10 @@ class UserApi
 
     /**
      * @param SearchUsersRequest $search
+     * @param string $token
      * @return User[]
      */
-    public function search(SearchUsersRequest $search)
+    public function search(SearchUsersRequest $search, $token)
     {
         $url = $this->getSearchUrl();
         if ($query = $search->buildQueryString()) {
@@ -45,7 +46,7 @@ class UserApi
             $response = $this->client->makeJsonRequest(
                 'GET',
                 $url,
-                $this->client->authorizeAsAdmin()
+                $token
             );
             $data = json_decode($response->getBody()->getContents(), true);
 
@@ -62,11 +63,12 @@ class UserApi
 
     /**
      * @param UserRequest $request
+     * @param string $token
      * @return User
      * @throws HttpException
      * @throws UserException
      */
-    public function create(UserRequest $request)
+    public function create(UserRequest $request, $token)
     {
         $params = array_merge($request->toArray(), ['emailVerified' => true, 'enabled' => true]);
 
@@ -75,7 +77,7 @@ class UserApi
             $response = $this->client->makeJsonRequest(
                 'POST',
                 $this->getCreateUserUrl(),
-                $this->client->authorizeAsAdmin(),
+                $token,
                 $params
             );
             $userDataUrl = $response->getHeader('Location')[0] ?? null;
@@ -84,7 +86,7 @@ class UserApi
             $response = $this->client->makeJsonRequest(
                 'GET',
                 $userDataUrl,
-                $this->client->authorizeAsAdmin()
+                $token
             );
             $userData = json_decode($response->getBody()->getContents(), true);
 
@@ -99,17 +101,18 @@ class UserApi
     /**
      * @param string $userId
      * @param UserRequest $request
+     * @param string $token
      * @return bool
      * @throws HttpException
      * @throws UserException
      */
-    public function update($userId, UserRequest $request)
+    public function update($userId, UserRequest $request, $token)
     {
         try {
             $this->client->makeJsonRequest(
                 'PUT',
                 $this->getSingleUserUrl($userId),
-                $this->client->authorizeAsAdmin(),
+                $token,
                 $request->toArray(true)
             );
 
@@ -122,14 +125,15 @@ class UserApi
     }
 
     /**
-     * @param string$userId
+     * @param string $userId
+     * @param string $token
      * @param string|null $clientId
      * @param string|null $redirectUrl
      * @return bool
      * @throws HttpException
      * @throws UserException
      */
-    public function requestPasswordReset($userId, $clientId = null, $redirectUrl = null)
+    public function requestPasswordReset($userId, $token, $clientId = null, $redirectUrl = null)
     {
         $url = $this->getUpdatePasswordEmailUrl($userId, $clientId, $redirectUrl);
 
@@ -137,7 +141,7 @@ class UserApi
             $this->client->makeJsonRequest(
                 'PUT',
                 $url,
-                $this->client->authorizeAsAdmin(),
+                $token,
                 ['UPDATE_PASSWORD']
             );
 
@@ -151,16 +155,17 @@ class UserApi
 
     /**
      * @param string $userId
+     * @param string $token
      * @return User
      * @throws HttpException
      * @throws UserException
      */
-    public function get($userId)
+    public function get($userId, $token)
     {
         $response = $this->client->makeJsonRequest(
             'GET',
             $this->getSingleUserUrl($userId),
-            $this->client->authorizeAsAdmin()
+            $token
         );
 
         $userData = json_decode($response->getBody()->getContents(), true);

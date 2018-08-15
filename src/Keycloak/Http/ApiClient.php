@@ -13,40 +13,10 @@ class ApiClient
      * @var Client
      */
     protected $transport;
-    private $adminUsername;
-    private $adminPassword;
-    private $adminClientId;
 
-    public function __construct($baseUrl, $adminUsername, $adminPassword, $adminClientId, Client $transport = null)
+    public function __construct($baseUrl, Client $transport = null)
     {
         $this->transport = $transport ?? new Client(['base_uri' => $baseUrl]);
-        $this->adminUsername = $adminUsername;
-        $this->adminPassword = $adminPassword;
-        $this->adminClientId = $adminClientId;
-    }
-
-    public function authorize($clientId, $login, $password)
-    {
-        $response = $this->makeFormRequest(
-            'POST',
-            'protocol/openid-connect/token',
-            [
-                'grant_type' => 'password',
-                'client_id' => $clientId,
-                'username' => $login,
-                'password' => $password
-            ]
-        );
-
-        return $response['access_token'] ?? null;
-    }
-
-    /**
-     * @return string
-     */
-    public function authorizeAsAdmin()
-    {
-        return $this->authorize($this->adminClientId, $this->adminUsername, $this->adminPassword);
     }
 
     /**

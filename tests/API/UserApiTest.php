@@ -26,9 +26,6 @@ class UserApiTest extends TestCase
         $this->apiClientMock = $this->getMockBuilder(ApiClient::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->apiClientMock->expects($this->any())->method('authorizeAsAdmin')
-            ->willReturn('token')
-        ;
         $this->userApi = new UserApi($this->apiClientMock, 'realm');
     }
 
@@ -50,7 +47,7 @@ class UserApiTest extends TestCase
             ->willReturn($responseMock)
         ;
 
-        $users = $this->userApi->search(new SearchUsersRequest($search));
+        $users = $this->userApi->search(new SearchUsersRequest($search), 'token');
 
         $this->assertCount(2, $users);
 
@@ -69,8 +66,8 @@ class UserApiTest extends TestCase
     public function searchDataProvider()
     {
         return [
-//            [['username' => 'foo'], 'admin/realms/realm/users?username=foo&limit=100&offset=0'],
-//            [['email' => 'foo@email.com'], 'admin/realms/realm/users?email=foo%40email.com&limit=100&offset=0'],
+            [['username' => 'foo'], 'admin/realms/realm/users?username=foo&limit=100&offset=0'],
+            [['email' => 'foo@email.com'], 'admin/realms/realm/users?email=foo%40email.com&limit=100&offset=0'],
             [['first_name' => 'first'], 'admin/realms/realm/users?firstName=first&limit=100&offset=0'],
             [['last_name' => 'last'], 'admin/realms/realm/users?lastName=last&limit=100&offset=0'],
             [['search' => 'foo'], 'admin/realms/realm/users?search=foo&limit=100&offset=0'],
@@ -94,7 +91,7 @@ class UserApiTest extends TestCase
             ->willReturnOnConsecutiveCalls($userCreatedResponse, $userResponse)
         ;
 
-        $user = $this->userApi->create(new UserRequest([]));
+        $user = $this->userApi->create(new UserRequest([]), 'token');
 
         $this->assertEquals(123, $user->getId());
         $this->assertEquals('foo1', $user->getUsername());
@@ -111,7 +108,7 @@ class UserApiTest extends TestCase
             ->willReturn($userResponse)
         ;
 
-        $result = $this->userApi->update(123, new UserRequest([]));
+        $result = $this->userApi->update(123, new UserRequest([]), 'token');
 
         $this->assertTrue($result);
     }
@@ -128,7 +125,7 @@ class UserApiTest extends TestCase
             ->willReturn($responseMock)
         ;
 
-        $user = $this->userApi->get(123);
+        $user = $this->userApi->get(123, 'token');
 
         $this->assertEquals(123, $user->getId());
         $this->assertEquals('foo1', $user->getUsername());
@@ -156,7 +153,7 @@ class UserApiTest extends TestCase
             ->willReturn($userResponse)
         ;
 
-        $result = $this->userApi->requestPasswordReset($id, $clientId, $redirectUrl);
+        $result = $this->userApi->requestPasswordReset($id, 'token', $clientId, $redirectUrl);
 
         $this->assertTrue($result);
     }
@@ -214,9 +211,9 @@ class UserApiTest extends TestCase
     public function errorDataProvider()
     {
         return [
-            ['create', [new UserRequest([])]],
-            ['update', [123, new UserRequest([])]],
-            ['requestPasswordReset', [123, 'client', 'http://example.com']],
+            ['create', [new UserRequest([]), 'token']],
+            ['update', [123, new UserRequest([]), 'token']],
+            ['requestPasswordReset', [123, 'token', 'client', 'http://example.com']],
         ];
     }
 }

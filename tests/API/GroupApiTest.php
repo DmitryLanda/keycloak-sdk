@@ -1,12 +1,13 @@
 <?php
+
 namespace Neospheres\Keycloak\Test\API;
 
 use Neospheres\Keycloak\API\GroupApi;
 use Neospheres\Keycloak\Exceptions\HttpException;
 use Neospheres\Keycloak\Http\ApiClient;
 use Neospheres\Keycloak\Models\GroupRequest;
-use PHPUnit\Framework\MockObject\MockObject;
 use Neospheres\Keycloak\Test\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class GroupApiTest extends TestCase
 {
@@ -25,9 +26,6 @@ class GroupApiTest extends TestCase
         $this->apiClientMock = $this->getMockBuilder(ApiClient::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->apiClientMock->expects($this->any())->method('authorizeAsAdmin')
-            ->willReturn('token')
-        ;
         $this->groupApi = new GroupApi($this->apiClientMock, 'realm');
     }
 
@@ -46,10 +44,9 @@ class GroupApiTest extends TestCase
         $responseMock = $this->createResponseMock($result);
         $this->apiClientMock->expects($this->once())->method('makeJsonRequest')
             ->with('GET', $expectedUrl, 'token')
-            ->willReturn($responseMock)
-        ;
+            ->willReturn($responseMock);
 
-        $groups = $this->groupApi->search($userId);
+        $groups = $this->groupApi->search($userId, 'token');
 
         $this->assertCount(2, $groups);
 
@@ -79,14 +76,12 @@ class GroupApiTest extends TestCase
         $groupCreatedResponse = $this->createResponseMock();
         $groupCreatedResponse->expects($this->once())->method('getHeader')
             ->with('Location')
-            ->willReturn(['any-url'])
-        ;
+            ->willReturn(['any-url']);
         $groupResponse = $this->createResponseMock('{"id":123,"name":"foo1"}');
         $this->apiClientMock->expects($this->any())->method('makeJsonRequest')
-            ->willReturnOnConsecutiveCalls($groupCreatedResponse, $groupResponse)
-        ;
+            ->willReturnOnConsecutiveCalls($groupCreatedResponse, $groupResponse);
 
-        $user = $this->groupApi->create(new GroupRequest([]));
+        $user = $this->groupApi->create(new GroupRequest([]), 'token');
 
         $this->assertEquals(123, $user->getId());
         $this->assertEquals('foo1', $user->getName());
@@ -101,10 +96,9 @@ class GroupApiTest extends TestCase
         $responseMock = $this->createResponseMock($result);
         $this->apiClientMock->expects($this->once())->method('makeJsonRequest')
             ->with('GET', 'admin/realms/realm/groups/123', 'token')
-            ->willReturn($responseMock)
-        ;
+            ->willReturn($responseMock);
 
-        $group = $this->groupApi->get(123);
+        $group = $this->groupApi->get(123, 'token');
 
         $this->assertEquals(123, $group->getId());
         $this->assertEquals('foo1', $group->getName());
@@ -117,10 +111,9 @@ class GroupApiTest extends TestCase
     public function requestWithHttpError()
     {
         $this->apiClientMock->method('makeJsonRequest')
-            ->willThrowException(new HttpException())
-        ;
+            ->willThrowException(new HttpException());
 
-        $this->groupApi->create(new GroupRequest([]));
+        $this->groupApi->create(new GroupRequest([]), 'token');
     }
 
     /**
@@ -130,9 +123,8 @@ class GroupApiTest extends TestCase
     public function requestWithCommonError()
     {
         $this->apiClientMock->method('makeJsonRequest')
-            ->willThrowException(new \Exception())
-        ;
+            ->willThrowException(new \Exception());
 
-        $this->groupApi->create(new GroupRequest([]));
+        $this->groupApi->create(new GroupRequest([]), 'token');
     }
 }

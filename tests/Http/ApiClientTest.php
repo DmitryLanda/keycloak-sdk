@@ -27,9 +27,6 @@ class ApiClientTest extends TestCase
             ->getMock();
         $this->apiClient = new ApiClient(
             'http://sso',
-            'admin',
-            'password',
-            '123',
             $this->transport
         );
     }
@@ -108,58 +105,5 @@ class ApiClientTest extends TestCase
             ));
 
         $this->apiClient->makeJsonRequest('GET', 'bad-url', 'token');
-    }
-
-    /**
-     * @test
-     * @depends makeSuccessfulFormRequest
-     */
-    public function authorize()
-    {
-        $responseMock = $this->createResponseMock();
-
-        $this->transport->expects($this->once())->method('request')
-            ->with(
-                'POST',
-                'protocol/openid-connect/token',
-                [
-                    'form_params' => [
-                        'grant_type' => 'password',
-                        'client_id' => 'foo',
-                        'username' => 'bar',
-                        'password' => 'buz'
-                    ]
-                ]
-            )
-
-            ->willReturn($responseMock);
-
-        $this->apiClient->authorize('foo', 'bar', 'buz');
-    }
-
-    /**
-     * @test
-     * @depends authorize
-     */
-    public function authorizeAsAdmin()
-    {
-        $responseMock = $this->createResponseMock();
-
-        $this->transport->expects($this->once())->method('request')
-            ->with(
-                'POST',
-                'protocol/openid-connect/token',
-                [
-                    'form_params' => [
-                        'grant_type' => 'password',
-                        'client_id' => '123',
-                        'username' => 'admin',
-                        'password' => 'password'
-                    ]
-                ]
-            )
-            ->willReturn($responseMock);
-
-        $this->apiClient->authorizeAsAdmin();
     }
 }

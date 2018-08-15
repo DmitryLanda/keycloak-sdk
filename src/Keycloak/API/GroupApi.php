@@ -33,17 +33,18 @@ class GroupApi
     /**
      * @param string $userId
      * @param string $groupId
+     * @param string $token
      * @return bool
      * @throws HttpException
      * @throws GroupException
      */
-    public function addUser($userId, $groupId)
+    public function addUser($userId, $groupId, $token)
     {
         try {
             $this->client->makeJsonRequest(
                 'PUT',
                 $this->getAddUserToGroupUrl($userId, $groupId),
-                $this->client->authorizeAsAdmin()
+                $token
             );
 
             return true;
@@ -56,9 +57,10 @@ class GroupApi
 
     /**
      * @param string|null $userId
+     * @param string $token
      * @return Group[]
      */
-    public function search($userId = null)
+    public function search($userId = null, $token)
     {
         if ($userId) {
             $url = $this->getUserGroupsUrl($userId);
@@ -70,7 +72,7 @@ class GroupApi
             $response = $this->client->makeJsonRequest(
                 'GET',
                 $url,
-                $this->client->authorizeAsAdmin()
+                $token
             );
 
             $groupsData = json_decode($response->getBody()->getContents(), true);
@@ -88,17 +90,18 @@ class GroupApi
 
     /**
      * @param $groupId
+     * @param string $token
      * @return Group
      * @throws HttpException
      * @throws GroupException
      */
-    public function get($groupId)
+    public function get($groupId, $token)
     {
         try {
             $response = $this->client->makeJsonRequest(
                 'GET',
                 $this->getSingleGroupUrl($groupId),
-                $this->client->authorizeAsAdmin()
+                $token
             );
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -113,18 +116,19 @@ class GroupApi
 
     /**
      * @param GroupRequest $request
+     * @param string $token
      * @return Group
      * @throws HttpException
      * @throws GroupException
      */
-    public function create(GroupRequest $request)
+    public function create(GroupRequest $request, $token)
     {
         try {
             //create group
             $response = $this->client->makeJsonRequest(
                 'POST',
                 $this->getAllGroupsUrl(),
-                $this->client->authorizeAsAdmin(),
+                $token,
                 $request->toArray()
             );
             $groupUrl = $response->getHeader('Location')[0] ?? null;
@@ -133,7 +137,7 @@ class GroupApi
             $response = $this->client->makeJsonRequest(
                 'GET',
                 $groupUrl,
-                $this->client->authorizeAsAdmin()
+                $token
             );
             $data = json_decode($response->getBody()->getContents(), true);
 
