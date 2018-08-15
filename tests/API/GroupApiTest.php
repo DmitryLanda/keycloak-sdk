@@ -106,6 +106,28 @@ class GroupApiTest extends TestCase
 
     /**
      * @test
+     */
+    public function getUserGroups()
+    {
+        $result = '[{"id":123,"name":"foo1"}, {"id":456,"name":"foo2"}]';
+        $responseMock = $this->createResponseMock($result);
+        $this->apiClientMock->expects($this->once())->method('makeJsonRequest')
+            ->with('GET', 'admin/realms/realm/users/123/groups', 'token')
+            ->willReturn($responseMock);
+
+        $groups = $this->groupApi->getUserGroups(123, 'token');
+
+        $this->assertCount(2, $groups);
+
+        $this->assertEquals(123, $groups[0]->getId());
+        $this->assertEquals('foo1', $groups[0]->getName());
+
+        $this->assertEquals(456, $groups[1]->getId());
+        $this->assertEquals('foo2', $groups[1]->getName());
+    }
+
+    /**
+     * @test
      * @expectedException \Neospheres\Keycloak\Exceptions\HttpException
      */
     public function requestWithHttpError()

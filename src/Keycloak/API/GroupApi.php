@@ -115,6 +115,37 @@ class GroupApi
     }
 
     /**
+     * @param $userId
+     * @param string $token
+     * @return Group[]
+     * @throws HttpException
+     * @throws GroupException
+     */
+    public function getUserGroups($userId, $token)
+    {
+        try {
+            $response = $this->client->makeJsonRequest(
+                'GET',
+                $this->getUserGroupsUrl($userId),
+                $token
+            );
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            $groups = [];
+            foreach ($data as $item) {
+                $groups[] = new Group($item);
+            }
+
+            return $groups;
+        } catch (HttpException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw GroupException::failedToFind($e);
+        }
+    }
+
+    /**
      * @param GroupRequest $request
      * @param string $token
      * @return Group
