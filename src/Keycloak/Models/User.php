@@ -11,37 +11,47 @@ class User
     /**
      * @var string
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
      */
-    protected $username;
+    private $username;
 
     /**
      * @var string
      */
-    protected $email;
+    private $email;
+
+    /**
+     * @var string
+     */
+    private $firstName;
+
+    /**
+     * @var string
+     */
+    private $lastName;
 
     /**
      * @var bool
      */
-    protected $emailVerified;
+    private $emailVerified;
 
     /**
      * @var bool
      */
-    protected $enabled;
+    private $enabled;
 
     /**
      * @var integer
      */
-    protected $createdTimestamp;
+    private $createdTimestamp;
 
     /**
      * @var array
      */
-    protected $attributes;
+    private $attributes;
 
     /**
      * KeycloakUser constructor.
@@ -113,5 +123,21 @@ class User
         }
 
         return $attributes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
     }
 }

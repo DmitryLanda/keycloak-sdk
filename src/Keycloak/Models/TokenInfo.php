@@ -9,10 +9,17 @@ class TokenInfo
     private $id;
     private $username;
     private $email;
+    private $firstName;
+    private $lastName;
 
     public function __construct(array $params)
     {
-        $this->mapParams($params, ['sub' => 'id', 'preferred_username' => 'username']);
+        $this->mapParams($params, [
+            'sub' => 'id',
+            'preferred_username' => 'username',
+            'given_name' => 'first_name',
+            'family_name' => 'last_name'
+        ]);
     }
 
     /**
@@ -37,5 +44,21 @@ class TokenInfo
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
     }
 }
